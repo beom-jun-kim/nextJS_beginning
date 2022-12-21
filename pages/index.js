@@ -24,6 +24,7 @@ import Seo from "../components/seo";
 // url 앞부분 : Try it out 탭 → SEND REQUEST 옆
 
 export default function Home({results}) {
+  
   // ()() :
   // IIFE (즉시 실행 함수 표현, Immediately Invoked Function Expression). 
   // 첫번째 괄호는 익명함수를 감싸 실행 될 함수가 전역 스코프에 불필요한 
