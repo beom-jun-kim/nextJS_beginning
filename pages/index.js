@@ -16,6 +16,8 @@
 // next.js안에 있는 컴포넌트
 // 선언시 컴포넌트 안에 들어가는 모든 것들이 우리의 html의 head 안에 보여짐
 
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Seo from "../components/seo";
 
@@ -23,12 +25,11 @@ import Seo from "../components/seo";
 // fetch() url 불러오기 : 푸터에 api 클릭 → 디벨로퍼 파란링크 클릭 → MOVIES 클릭 → get popular → /로 적혀있는 부분이 url
 // url 앞부분 : Try it out 탭 → SEND REQUEST 옆
 
-export default function Home({results}) {
-  
+export default function Home({ results }) {
   // ()() :
-  // IIFE (즉시 실행 함수 표현, Immediately Invoked Function Expression). 
-  // 첫번째 괄호는 익명함수를 감싸 실행 될 함수가 전역 스코프에 불필요한 
-  // 변수를 추가하거나, IIFE 내부안으로 다른 변수들이 접근하는 것을 막을 수 있는 방법. 
+  // IIFE (즉시 실행 함수 표현, Immediately Invoked Function Expression).
+  // 첫번째 괄호는 익명함수를 감싸 실행 될 함수가 전역 스코프에 불필요한
+  // 변수를 추가하거나, IIFE 내부안으로 다른 변수들이 접근하는 것을 막을 수 있는 방법.
   // 두번째 괄호는 즉시 실행 함수를 생상하는 괄호.
   // 이를 통해 자바스크립트 엔진은 함수를 즉시 해석해서 실행
   // useEffect(() => {
@@ -42,24 +43,50 @@ export default function Home({results}) {
   //   })();
   // }, []);
 
-
-  // api 숨기기 : 누군가 악의적으로 사용할 수 있다 
+  // api 숨기기 : 누군가 악의적으로 사용할 수 있다
   // 확인 방법 :
   // 개발자 도구 > Network > popular ~~ > Headers 탭 > Request URL에서 api확인가능
   // 숨기기 : rewrite
-  
+
+  const router = useRouter();
+  const onClick = (id, title) => {
+    router.push(
+      {
+        pathname: `/movies/${id}`,
+        query: {
+          title,
+        },
+      },
+      `/movies/${id}` /* as : 브라우저에 보일 url을 마스킹한다 */
+    );
+  };
+
   return (
     <div>
       <div className="container">
         <Seo title="Home" />
         {results?.map((movie) => (
-          <div key={movie.id}>
-            <div className="movie" key={movie.id}>
-
-              {/* 사이트 푸터에 api 클릭 > 디벨로퍼 링크 클릭 > 좌측 바에 '이미지'클릭 */ }
-              <img src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`} />
-              <h4>{movie.original_title}</h4>
-            </div>
+          <div
+            onClick={() => onClick(movie.id, movie.original_title)}
+            className="movie"
+            key={movie.id}
+          >
+            {/* 사이트 푸터에 api 클릭 > 디벨로퍼 링크 클릭 > 좌측 바에 '이미지'클릭 */}
+            <img src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`} />
+            <h4>
+              <Link
+                href={{
+                  pathname: `/movies/${movie.id}`,
+                  query: {
+                    title: movie.original_title,
+                  },
+                }}
+                legacyBehavior
+                as={`/movies/${movie.id}`}
+              >
+                <a>{movie.original_title}</a>
+              </Link>
+            </h4>
           </div>
         ))}
         <style jsx>{`
@@ -88,8 +115,6 @@ export default function Home({results}) {
   );
 }
 
-
-
 // request 시 데이터를 fetch하고 결과를 pre-render하는 방법.
 // get server side props : loading을 안하기 위해
 // object를 return.
@@ -105,11 +130,13 @@ export default function Home({results}) {
 // 오직 html이기 때문에 자바스크립트를 꺼도 잘보인다
 
 // pre-Rendering : Next.js는 Client-side의 JavaScript에 의해 실행하는 것 대신 사전에 각 페이지의 HTML을 생성. 미리 HTML을 만드는 방식 쯤으로 이해해두면 된다!
-export async function getServerSideProps(){
-  const {results} = await (await fetch('http://localhost:3001/api/movies')).json();
+export async function getServerSideProps() {
+  const { results } = await (
+    await fetch("http://localhost:3000/api/movies")
+  ).json();
   return {
     props: {
       results,
-    }
-  }
+    },
+  };
 }

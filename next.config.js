@@ -26,9 +26,10 @@ const nextConfig = {
         destination:`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`,
 
       },
-      // {
-      //  redirect를 더 쓰고 싶다면 여기에
-      // }
+      {
+       source:"/api/movies/:id", /* 뒤에 id라고 입력해줬다면  destination 에도 id라고 해줘야 함*/
+       destination:`https://api.themoviedb.org/3/movie/:id?api_key=${API_KEY}`,
+      }
     ]
   }
 };
